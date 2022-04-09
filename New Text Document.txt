@@ -1,0 +1,146 @@
+Set Serveroutput on;
+-- drop table if already exists
+Drop table Tic_Tac_Toe;
+-- Create a table for Tic_Tac_Toe
+Create Table Tic_Tac_Toe(
+
+Row_Id Number(1) GENERATED ALWAYS AS IDENTITY START WITH 1 INCREMENT BY 1 MAXVALUE 3,
+Col1 Varchar2(1),
+Col2 Varchar2(1),
+Col3 Varchar2(1)
+);
+
+
+ALTER TABLE Tic_Tac_Toe
+Add Constraint Cons_Col1
+CHECK (Col1 IN('X','O','_'));
+
+ALTER TABLE Tic_Tac_Toe
+Add Constraint Cons_Col2
+CHECK (Col2 IN('X','O','_'));
+
+ALTER TABLE Tic_Tac_Toe
+Add Constraint Cons_Col3
+CHECK (Col3 IN('X','O','_'));
+
+
+Insert Into Tic_Tac_Toe(Col1,Col2,Col3) Values('_', '_', '_');
+Insert Into Tic_Tac_Toe(Col1,Col2,Col3) Values('_', '_', '_');
+Insert Into Tic_Tac_Toe(Col1,Col2,Col3) Values('_', '_', '_');
+
+Drop Table CheckPlayerSymbol;
+Create Table CheckPlayerSymbol(
+R_Id NUMBER(1) GENERATED ALWAYS AS IDENTITY START WITH 1 INCREMENT BY 1 MAXVALUE 2,
+Symbol VARCHAR(1) Not Null
+);
+
+Insert into CheckPlayerSymbol(Symbol) Values('a');
+
+
+--Procedures
+Create or Replace Procedure PlayGame(Row_No Number, Col_No Number, Mark1 Varchar2)
+As
+ValR1_C1 Tic_Tac_Toe.Col1%Type;
+ValR2_C1 Tic_Tac_Toe.Col1%Type;
+ValR3_C1 Tic_Tac_Toe.Col1%Type;
+ValR1_C2 Tic_Tac_Toe.Col2%Type;
+ValR2_C2 Tic_Tac_Toe.Col2%Type;
+ValR3_C2 Tic_Tac_Toe.Col2%Type;
+ValR1_C3 Tic_Tac_Toe.Col3%Type;
+ValR2_C3 Tic_Tac_Toe.Col3%Type;
+ValR3_C3 Tic_Tac_Toe.Col3%Type;
+Check_Symbol Varchar2(1);
+Check_Mark Varchar2(1);
+Pos_Check Exception;
+Similar_Player Exception;
+
+Begin
+
+Select Symbol into Check_Symbol from CheckPlayerSymbol where R_Id=1;
+
+IF Check_Symbol <> Mark1 THEN
+DBMS_OUTPUT.PUT_LINE(' ');
+ELSE
+RAISE Similar_Player;
+END IF;
+
+
+ CASE Col_No
+    WHEN 1 THEN Select Col1 into Check_Mark From Tic_Tac_Toe where Row_Id=Row_No;
+    WHEN 2 THEN Select Col2 into Check_Mark From Tic_Tac_Toe where Row_Id=Row_No;
+    WHEN 3 THEN Select Col3 into Check_Mark From Tic_Tac_Toe where Row_Id=Row_No;
+    
+    ELSE dbms_output.put_line('wrong row input'); 
+  END CASE;
+Commit;
+
+IF Check_Mark='_' THEN 
+
+    IF Col_No =1 THEN 
+    UPDATE CheckPlayerSymbol Set Symbol= Mark1 WHERE R_Id = 1 ;
+    UPDATE Tic_Tac_Toe Set Col1 = Mark1 Where Row_Id = Row_No ;
+    FOR Val IN (SELECT * FROM TICTACTOE) LOOP 
+    DBMS_OUTPUT.PUT_LINE(Val.Col1||' | '||Val.Col2||' | '||Val.Col3);
+    END LOOP;
+    
+    Elsif Col_N0=2 Then
+    UPDATE CheckPlayerSymbol Set Symbol= Mark1 WHERE R_Id =1 ;
+    UPDATE Tic_Tac_Toe Set Col2 = Mark1 Where Row_Id = Row_No ;            
+    FOR Val IN (SELECT * FROM TICTACTOE) LOOP 
+    DBMS_OUTPUT.PUT_LINE(Val.Col1||' | '||Val.Col2||' | '||Val.Col3);
+    END LOOP;
+    
+    Elsif Col_N0=3 Then
+    UPDATE CheckPlayerSymbol Set Symbol= Mark1 WHERE R_Id =1 ;
+    UPDATE Tic_Tac_Toe Set Col3 = Mark1 Where Row_Id = Row_No ;
+    FOR Val IN (SELECT * FROM TICTACTOE) LOOP 
+    DBMS_OUTPUT.PUT_LINE(Val.Col1||' | '||Val.Col2||' | '||Val.Col3);
+    END LOOP;
+    
+    ELSE
+                DBMS_OUTPUT.PUT_LINE('Wrong Col number');
+                
+    COMMIT;
+     END IF;
+
+
+
+SELECT Col1, Col2, Col3 INTO ValR1_C1,ValR1_C2,ValR1_C3 FROM Tic_Tac_Toe WHERE Row_Id = 1;
+SELECT Col1, Col2, Col3 INTO ValR2_C1,ValR2_C2,ValR2_C3 FROM Tic_Tac_Toe WHERE Row_Id = 2;
+SELECT Col1, Col2, Col3 INTO ValR3_C1,ValR3_C2,ValR3_C3 FROM Tic_Tac_Toe WHERE Row_Id = 3;
+
+--Vertical Column Cases
+IF(ValR1_C1=ValR2_C1 AND ValR1_C1=ValR3_C1) Then DBMS_OUTPUT.PUT_LINE(ValR1_C1||' won');
+ELSIF(ValR1_C2=ValR2_C2 AND ValR1_C2=ValR3_C2) Then DBMS_OUTPUT.PUT_LINE(ValR1_C2||' won'); 
+ELSIF(ValR1_C3=ValR2_C3 AND ValR1_C3=ValR3_C3) Then DBMS_OUTPUT.PUT_LINE(ValR1_C3||' won'); 
+--Horizontal Cases
+ELSIF(ValR1_C1=ValR1_C2 AND ValR1_C1=ValR1_C3) Then DBMS_OUTPUT.PUT_LINE(ValR1_C1||' won'); 
+ELSIF(ValR2_C1=ValR2_C2 AND ValR2_C1=ValR2_C3) Then DBMS_OUTPUT.PUT_LINE(ValR2_C1||' won'); 
+ELSIF(ValR3_C1=ValR3_C2 AND ValR3_C1=ValR3_C3) Then DBMS_OUTPUT.PUT_LINE(ValR3_C1||' won'); 
+--Diagonal Cases
+ELSIF(ValR1_C1=ValR2_C2 AND ValR1_C1=ValR3_C3) Then DBMS_OUTPUT.PUT_LINE(ValR1_C1||' won');
+ELSIF(ValR1_C3=ValR2_C2 AND ValR1_C3=ValR3_C1) Then DBMS_OUTPUT.PUT_LINE(ValR1_C3||' won'); 
+
+-- when anyone is blank and game is pending
+ELSIF (ValR1_C1='_' OR ValR1_C2='_' OR ValR1_C3='_' OR ValR2_C1='_' OR ValR2_C2='_' OR ValR2_C3='_' OR ValR3_C1='_' OR ValR3_C2='_' OR ValR3_C3='_') Then
+DBMS_OUTPUT.PUT_LINE('Next Chance');
+
+ELSE DBMS_OUTPUT.PUT_LINE('No one Won');
+              
+END IF;
+
+ELSE
+    RAISE Pos_Check;
+    
+END IF ;
+EXCEPTION
+
+  WHEN Pos_Check THEN 
+  DBMS_OUTPUT.PUT_LINE('Wrong position');
+  
+  WHEN Similar_Player THEN
+  DBMS_OUTPUT.PUT_LINE('Not your turn');
+
+END;
+/
+EXEC PlayGame(1,2,'O');
