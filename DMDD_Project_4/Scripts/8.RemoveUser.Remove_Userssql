@@ -1,0 +1,21 @@
+Set serveroutput on;
+create or replace procedure remove_user
+as
+Begin
+Execute Immediate 'DROP User Student1 cascade';
+Execute Immediate 'DROP User Professor1 cascade';
+Execute Immediate 'DROP Profile STUDENT_P cascade';
+Execute Immediate 'DROP Profile PROFESSOR_P cascade';
+Execute Immediate 'DROP ROLE Student_DML_Operation';
+Execute Immediate 'DROP ROLE Student_Read_Data';
+Execute Immediate 'DROP ROLE Prof_DML_Operation';
+Execute Immediate 'DROP ROLE Prof_Read_Data';
+DBMS_OUTPUT.PUT_LINE('USERS REMOVED');
+Exception
+When Others then
+DBMS_OUTPUT.PUT_LINE('Exception handled ---- user does not exist');
+end;
+/
+
+EXEC remove_user();
+

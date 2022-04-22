@@ -1,0 +1,15 @@
+Instructions to run the Project_4
+
+1)Run Drop Tables Script
+2)Run Table_Creation DDL
+3)Run Index
+4)Run Sequence_Creation
+5)Run Onboarding_DMLProcedures
+6)Run Onboarding_InsertData
+7)Run GrantAccess
+
+To Rerun the code
+** If you have connected with any user-specific role kindly disconnect before running the next script
+8)Run RemoveUser
+9)Run SequenceDrop
+Repeat steps 1 to 7
